@@ -1,0 +1,97 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <title>{% block title %}Детали путешествия{% endblock %}</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .trip-detail-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
+            max-width: 800px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        #map {
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'trip_list' %}">Дневник Путешествий</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_trip' %}">Создать новое путешествие</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="trip-detail-container">
+        <h2 class="mt-4">Детали путешествия: {{ trip.location }}</h2>
+        {% if trip.image %}
+            <img src="{{ trip.image.url }}" alt="Изображение путешествия" class="img-fluid">
+        {% else %}
+            <p>Изображение путешествия не загружено.</p>
+        {% endif %}
+        <p><strong>Стоимость:</strong> {{ trip.cost }}</p>
+        <p><strong>Культурные места:</strong> {{ trip.cultural_sites }}</p>
+        <p><strong>Места для посещения:</strong> {{ trip.places_to_visit }}</p>
+        <p><strong>Оценка удобства:</strong> {{ trip.convenience_rating }}</p>
+
+        <!-- Контейнер для карты -->
+        <div id="map"></div>
+
+        <a class="btn btn-primary mt-3" href="{% url 'trip_list' %}">Назад к списку путешествий</a>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Инициализация карты
+        var map = L.map('map').setView([{{ trip.latitude }}, {{ trip.longitude }}], 13);
+
+        // Добавление слоя карты
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Добавление маркера на карту
+        L.marker([{{ trip.latitude }}, {{ trip.longitude }}]).addTo(map)
+            .bindPopup('{{ trip.location }}')
+            .openPopup();
+    </script>
+</body>
+</html>
