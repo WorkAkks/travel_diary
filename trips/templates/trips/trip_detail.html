@@ -71,7 +71,6 @@
         <p><strong>Места для посещения:</strong> {{ trip.places_to_visit }}</p>
         <p><strong>Оценка удобства:</strong> {{ trip.convenience_rating }}</p>
 
-        <!-- Контейнер для карты -->
         <div id="map"></div>
 
         <a class="btn btn-primary mt-3" href="{% url 'trip_list' %}">Назад к списку путешествий</a>
@@ -79,16 +78,13 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        // Инициализация карты
         var map = L.map('map').setView([{{ trip.latitude }}, {{ trip.longitude }}], 13);
 
-        // Добавление слоя карты
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Добавление маркера на карту
         L.marker([{{ trip.latitude }}, {{ trip.longitude }}]).addTo(map)
             .bindPopup('{{ trip.location }}')
             .openPopup();
